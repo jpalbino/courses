@@ -69,24 +69,6 @@ $$\left(
 
 ---
 
-## Example justification of the binomial likelihood
-
-- Consider the probability of getting $6$ heads out of $10$ coin flips from a coin with success probability $p$ 
-- The probability of getting $6$ heads and $4$ tails in any specific order is
-  $$
-  p^6(1-p)^4
-  $$
-- There are 
-$$\left(
-\begin{array}{c}
-  10 \\ 6
-\end{array}
-\right)
-$$
-possible orders of $6$ heads and $4$ tails
-
----
-
 ## Example
 
 - Suppose a friend has $8$ children (oh my!), $7$ of which are girls and none are twins
@@ -105,7 +87,7 @@ $$\left(
 $$
 
 ```r
-choose(8, 7) * .5 ^ 8 + choose(8, 8) * .5 ^ 8 
+choose(8, 7) * 0.5^8 + choose(8, 8) * 0.5^8
 ```
 
 ```
@@ -113,12 +95,13 @@ choose(8, 7) * .5 ^ 8 + choose(8, 8) * .5 ^ 8
 ```
 
 ```r
-pbinom(6, size = 8, prob = .5, lower.tail = FALSE)
+pbinom(6, size = 8, prob = 0.5, lower.tail = FALSE)
 ```
 
 ```
 ## [1] 0.03516
 ```
+
 
 
 ---
@@ -132,20 +115,22 @@ pbinom(6, size = 8, prob = .5, lower.tail = FALSE)
   If $X$ a RV with this density then $E[X] = \mu$ and $Var(X) = \sigma^2$
 - We write $X\sim \mbox{N}(\mu, \sigma^2)$
 - When $\mu = 0$ and $\sigma = 1$ the resulting distribution is called **the standard normal distribution**
-- The standard normal density function is labeled $\phi$
 - Standard normal RVs are often labeled $Z$
 
 ---
-## The standard normal distribution with reference lines
+## The standard normal distribution with reference lines 
 <img src="assets/fig/unnamed-chunk-2.png" title="plot of chunk unnamed-chunk-2" alt="plot of chunk unnamed-chunk-2" style="display: block; margin: auto;" />
+
 
 ---
 
 ## Facts about the normal density
 
-- If $X \sim \mbox{N}(\mu,\sigma^2)$ the $Z = \frac{X -\mu}{\sigma}$ is standard normal
-- If $Z$ is standard normal $$X = \mu + \sigma Z \sim \mbox{N}(\mu, \sigma^2)$$
-- The non-standard normal density is $$\phi\{(x - \mu) / \sigma\}/\sigma$$
+If $X \sim \mbox{N}(\mu,\sigma^2)$ then 
+$$Z = \frac{X -\mu}{\sigma} \sim N(0, 1)$$ 
+
+
+If $Z$ is standard normal $$X = \mu + \sigma Z \sim \mbox{N}(\mu, \sigma^2)$$
 
 ---
 
@@ -161,56 +146,83 @@ pbinom(6, size = 8, prob = .5, lower.tail = FALSE)
 
 - What is the $95^{th}$ percentile of a $N(\mu, \sigma^2)$ distribution? 
   - Quick answer in R `qnorm(.95, mean = mu, sd = sd)`
-- We want the point $x_0$ so that $P(X \leq x_0) = .95$
-$$
-  \begin{eqnarray*}
-    P(X \leq x_0) & = & P\left(\frac{X - \mu}{\sigma} \leq \frac{x_0 - \mu}{\sigma}\right) \\ \\
-                  & = & P\left(Z \leq \frac{x_0 - \mu}{\sigma}\right) =  .95
-  \end{eqnarray*}
-$$
-- Therefore
-  $$\frac{x_0 - \mu}{\sigma} = 1.645$$
-  or $x_0 = \mu + \sigma 1.645$
-- In general $x_0 = \mu + \sigma z_0$ where $z_0$ is the appropriate standard normal quantile
+- Or, because you have the standard normal quantiles memorized
+and you know that 1.645 is the 95th percentile you know that the answer has to be
+$$\mu + \sigma 1.645$$
+- (In general $\mu + \sigma z_0$ where $z_0$ is the appropriate standard normal quantile)
 
 ---
 
 ## Question
 
-- What is the probability that a $\mbox{N}(\mu,\sigma^2)$ RV is 2 standard deviations above the mean?
-- We want to know
-$$
-  \begin{eqnarray*}
-  P(X > \mu + 2\sigma) & = & 
-P\left(\frac{X -\mu}{\sigma} > \frac{\mu + 2\sigma - \mu}{\sigma}\right)    \\ \\
-& = & P(Z \geq 2 ) \\ \\ 
-& \approx & 2.5\%
-  \end{eqnarray*}
-$$
+- What is the probability that a $\mbox{N}(\mu,\sigma^2)$ RV is larger than $x$?
+
+---
+## Example
+
+Assume that the number of daily ad clicks for a company 
+is (approximately) normally distributed with a mean of 1020 and a standard
+deviation of 50. What's the probability of getting
+more than  1,160 clicks in a day?
 
 ---
 
-## Other properties
+## Example
 
-- The normal distribution is symmetric and peaked about its mean (therefore the mean, median and mode are all equal)
-- A constant times a normally distributed random variable is also normally distributed (what is the mean and variance?)
-- Sums of normally distributed random variables are again normally distributed even if the variables are dependent (what is the mean and variance?)
-- Sample means of normally distributed random variables are again normally distributed (with what mean and variance?)
-- The square of a *standard normal* random variable follows what is called **chi-squared** distribution 
-- The exponent of a normally distributed random variables follows what is called the **log-normal** distribution 
-- As we will see later, many random variables, properly normalized, *limit* to a normal distribution
+Assume that the number of daily ad clicks for a company 
+is (approximately) normally distributed with a mean of 1020 and a standard
+deviation of 50. What's the probability of getting
+more than  1,160 clicks in a day?
+
+It's not very likely, 1,160 is 2.8 standard
+deviations from the mean 
+
+```r
+pnorm(1160, mean = 1020, sd = 50, lower.tail = FALSE)
+```
+
+```
+## [1] 0.002555
+```
+
+```r
+pnorm(2.8, lower.tail = FALSE)
+```
+
+```
+## [1] 0.002555
+```
+
 
 ---
 
-## Final thoughts on normal likelihoods
-- The MLE for $\mu$ is $\bar X$.
-- The MLE for $\sigma^2$ is
-  $$
-  \frac{\sum_{i=1}^n (X_i - \bar X)^2}{n}
-  $$
-  (Which is the biased version of the sample variance.)
-- The MLE of $\sigma$ is simply the square root of this
-  estimate
+## Example
+
+Assume that the number of daily ad clicks for a company 
+is (approximately) normally distributed with a mean of 1020 and a standard
+deviation of 50. What number of daily ad clicks would represent
+the one where 75% of days have fewer clicks (assuming
+days are independent and identically distributed)?
+
+---
+
+## Example
+
+Assume that the number of daily ad clicks for a company 
+is (approximately) normally distributed with a mean of 1020 and a standard
+deviation of 50. What number of daily ad clicks would represent
+the one where 75% of days have fewer clicks (assuming
+days are independent and identically distributed)?
+
+
+```r
+qnorm(0.75, mean = 1020, sd = 50)
+```
+
+```
+## [1] 1054
+```
+
 
 ---
 ## The Poisson distribution
@@ -226,24 +238,10 @@ for $x=0,1,\ldots$
 
 ---
 ## Some uses for the Poisson distribution
-* Modeling event/time data
-* Modeling radioactive decay
-* Modeling survival data
-* Modeling unbounded count data 
+* Modeling count data  
+* Modeling event-time or survival data
 * Modeling contingency tables
 * Approximating binomials when $n$ is large and $p$ is small
-
----
-## Poisson derivation
-* $\lambda$ is the mean number of events per unit time
-* Let $h$ be very small 
-* Suppose we assume that 
-  * Prob. of an event in an interval of length $h$ is $\lambda h$
-    while the prob. of more than one event is negligible
-  * Whether or not an event occurs in one small interval
-    does not impact whether or not an event occurs in another
-    small interval
-then, the number of events per unit time is Poisson with mean $\lambda$ 
 
 ---
 ## Rates and Poisson random variables
@@ -251,17 +249,6 @@ then, the number of events per unit time is Poisson with mean $\lambda$
 * $X \sim Poisson(\lambda t)$ where 
   * $\lambda = E[X / t]$ is the expected count per unit of time
   * $t$ is the total monitoring time
-
----
-## Poisson approximation to the binomial
-* When $n$ is large and $p$ is small the Poisson distribution
-  is an accurate approximation to the binomial distribution
-* Notation
-  * $\lambda = n p$
-  * $X \sim \mbox{Binomial}(n, p)$, $\lambda = n p$ and
-  * $n$ gets large 
-  * $p$ gets small
-  * $\lambda$ stays constant
 
 ---
 ## Example
@@ -280,6 +267,18 @@ ppois(3, lambda = 2.5 * 4)
 ## [1] 0.01034
 ```
 
+
+---
+## Poisson approximation to the binomial
+* When $n$ is large and $p$ is small the Poisson distribution
+  is an accurate approximation to the binomial distribution
+* Notation
+  * $X \sim \mbox{Binomial}(n, p)$
+  * $\lambda = n p$
+  * $n$ gets large 
+  * $p$ gets small
+
+
 ---
 ## Example, Poisson approximation to the binomial
 
@@ -289,7 +288,7 @@ What's the probability of 2 or fewer successes?
 
 
 ```r
-pbinom(2, size = 500, prob = .01)
+pbinom(2, size = 500, prob = 0.01)
 ```
 
 ```
@@ -297,10 +296,11 @@ pbinom(2, size = 500, prob = .01)
 ```
 
 ```r
-ppois(2, lambda=500 * .01)
+ppois(2, lambda = 500 * 0.01)
 ```
 
 ```
 ## [1] 0.1247
 ```
+
 
